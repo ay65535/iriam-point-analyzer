@@ -1,0 +1,5 @@
+engine: easyocr        # OCRエンジン (easyocr or tesseract)
+preprocessing: none    # 前処理 (none, basic, adaptive, otsu)
+language: ja           # OCR対象言語
+psm: 3                 # Tesseract Page Segmentation Mode
+log_level: INFO        # ログレベル (DEBUG, INFO, WARNING, ERROR)
