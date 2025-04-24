@@ -271,3 +271,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+### for this repo
+
+config/expected_data.yaml
