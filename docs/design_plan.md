@@ -17,8 +17,7 @@
     - `image_processor.py`: 画像処理のメインクラス。
     - `preprocessor.py`: 前処理メソッドの実装。
   - **`evaluation/`**: 精度評価関連。
-    - `evaluator.py`: テキスト評価の実装。
-    - `metrics.py`: 評価指標の計算。
+    - `metrics.py`: テキスト評価の実装・評価指標の計算。
   - **`utils/`**: 共通ユーティリティ。
     - `file_utils.py`: ファイル操作ユーティリティ。
   - **`config/`**: 設定関連。

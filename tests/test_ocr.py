@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 from src.ocr.ocr_engine import OCREngine
 from src.preprocessing.preprocessor import preprocess
-from src.evaluation.evaluator import compare_normalized, load_expected
+from src.evaluation.metrics import TextEvaluator
 
 TEST_IMAGE = "data/img/IMG_1527.PNG"
 
@@ -30,5 +30,5 @@ def test_ocr_workflow(method):
     assert len(results) > 0
     assert all(isinstance(text, str) for text in results)
 
-    accuracy = compare_normalized(results, load_expected())
+    accuracy = TextEvaluator.compare_normalized(results, TextEvaluator.load_expected())
     assert accuracy > 0
