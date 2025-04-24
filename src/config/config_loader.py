@@ -2,7 +2,7 @@ import os
 import yaml
 
 
-def load_settings(path: str = "config/settings.yaml") -> dict:
+def load_config(path: str = "config/settings.yaml") -> dict:
     """
     設定ファイルを読み込み、辞書として返す。
     Args:
