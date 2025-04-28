@@ -7,6 +7,8 @@ from .constants import NAME_TABLE, ERROR_PATTERNS
 # name_mapping辞書の作成
 name_mapping = {name_jp: name_eng for name_eng, name_jp in NAME_TABLE}
 
+__all__ = ["normalize_text_for_name", "get_name_from_table"]
+
 
 def normalize_text_for_name(raw_name: str) -> str:
     """
@@ -27,71 +29,20 @@ def normalize_text_for_name(raw_name: str) -> str:
         cleaned = re.sub(pattern, "", cleaned)
 
     # 全角英数字を半角へ変換
-    zen_han_map = {
-        "０": "0",
-        "１": "1",
-        "２": "2",
-        "３": "3",
-        "４": "4",
-        "５": "5",
-        "６": "6",
-        "７": "7",
-        "８": "8",
-        "９": "9",
-        "ａ": "a",
-        "ｂ": "b",
-        "ｃ": "c",
-        "ｄ": "d",
-        "ｅ": "e",
-        "ｆ": "f",
-        "ｇ": "g",
-        "ｈ": "h",
-        "ｉ": "i",
-        "ｊ": "j",
-        "ｋ": "k",
-        "ｌ": "l",
-        "ｍ": "m",
-        "ｎ": "n",
-        "ｏ": "o",
-        "ｐ": "p",
-        "ｑ": "q",
-        "ｒ": "r",
-        "ｓ": "s",
-        "ｔ": "t",
-        "ｕ": "u",
-        "ｖ": "v",
-        "ｗ": "w",
-        "ｘ": "x",
-        "ｙ": "y",
-        "ｚ": "z",
-        "Ａ": "A",
-        "Ｂ": "B",
-        "Ｃ": "C",
-        "Ｄ": "D",
-        "Ｅ": "E",
-        "Ｆ": "F",
-        "Ｇ": "G",
-        "Ｈ": "H",
-        "Ｉ": "I",
-        "Ｊ": "J",
-        "Ｋ": "K",
-        "Ｌ": "L",
-        "Ｍ": "M",
-        "Ｎ": "N",
-        "Ｏ": "O",
-        "Ｐ": "P",
-        "Ｑ": "Q",
-        "Ｒ": "R",
-        "Ｓ": "S",
-        "Ｔ": "T",
-        "Ｕ": "U",
-        "Ｖ": "V",
-        "Ｗ": "W",
-        "Ｘ": "X",
-        "Ｙ": "Y",
-        "Ｚ": "Z",
-    }
-    cleaned = cleaned.translate(str.maketrans(zen_han_map))
+    zen_chars = (
+        "０１２３４５６７８９"
+        "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
+        "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
+    )
+    han_chars = (
+        "0123456789"
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    )
+
+    # 文字列から文字列へのマッピングで変換テーブルを作成
+    trans_table = str.maketrans(zen_chars, han_chars)
+    cleaned = cleaned.translate(trans_table)
 
     # 余分な空白を削除
     return cleaned.strip()
@@ -117,7 +68,9 @@ def get_name_from_table(namae: str) -> tuple[str, str]:
 
     # fuzzywuzzyで近いものを探す
     candidates = list(name_mapping.keys())
-    match_result = process.extractOne(normed, candidates)
+    match_result: tuple[str, int] | None = process.extractOne(
+        normed, candidates
+    )
     if match_result and match_result[1] >= 70:
         close_jp = match_result[0]
         return name_mapping[close_jp], close_jp

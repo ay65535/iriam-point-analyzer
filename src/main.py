@@ -46,8 +46,14 @@ def main():
             else:
                 print(f"情報: {filename} から有効なデータを抽出できません。")
 
-    except Exception as e:
-        print(f"エラーが発生しました: {e}")
+    except (FileNotFoundError, PermissionError) as e:
+        print(f"ファイルアクセスエラー: {e}")
+        return
+    except ValueError as e:
+        print(f"データ処理エラー: {e}")
+        return
+    except IOError as e:
+        print(f"入出力エラー: {e}")
         return
 
     if not all_data:
@@ -68,8 +74,10 @@ def main():
             writer.writeheader()
             writer.writerows(all_data)
         print(f"処理完了: 結果を {output_csv} に出力しました。")
-    except Exception as e:
-        print(f"CSV書き込み中にエラー: {e}")
+    except IOError as e:
+        print(f"CSV書き込み中にIOエラー: {e}")
+    except (UnicodeError, ValueError) as e:
+        print(f"CSV書き込み中にデータエラー: {e}")
 
 
 if __name__ == "__main__":

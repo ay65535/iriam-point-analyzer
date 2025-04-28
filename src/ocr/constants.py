@@ -6,14 +6,16 @@ from pathlib import Path
 
 def _load_name_table():
     """設定ファイルから名前テーブルを読み込む"""
-    config_path = (
-        Path(__file__).parent.parent.parent / "config" / "private" / "name_data.json"
-    )
+    base_path = Path(__file__).parent.parent.parent
+    config_dir = base_path / "config" / "private"
+    config_path = config_dir / "name_data.json"
     if not config_path.exists():
-        raise FileNotFoundError(f"名前データファイルが見つかりません: {config_path}")
+        err_msg = f"名前データファイルが見つかりません: {config_path}"
+        raise FileNotFoundError(err_msg)
 
     with open(config_path, "r", encoding="utf-8") as f:
         data = json.load(f)
+    # 名前テーブルを返す
     return data["name_table"]
 
 
