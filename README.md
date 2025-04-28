@@ -22,6 +22,7 @@
   - Pillow >= 11.2.1
   - fuzzywuzzy >= 0.18.0
   - python-Levenshtein >= 0.27.1
+  - Flask >= 2.0.0
 
 ## インストール
 
@@ -44,7 +45,7 @@
    uv sync
    ```
 
-4. Tesseract OCRのインストール（macOS）：
+4. Tesseract OCRのインストール���macOS）：
 
    ```bash
    brew install tesseract
@@ -76,6 +77,8 @@
 
 ## 使い方
 
+### コマンドラインインターフェース
+
 1. 画像ファイルを `img/` ディレクトリに配置
 
 2. スクリプトを実行：
@@ -89,6 +92,20 @@
    - pt: ポイント値
    - name: 名前（英字）
    - namae: 名前（日本語）
+
+### ウェブインターフェース
+
+1. Flaskアプリケーションを起動：
+
+   ```bash
+   python src/app.py
+   ```
+
+2. ブラウザで `http://127.0.0.1:5000` にアクセス
+
+3. 画像ファイルをアップロードし、OCR結果を表示
+
+4. 結果をCSVファイルとしてダウンロード
 
 ## テストの実行
 
