@@ -1,1 +1,1 @@
-# tests directory for pytest
+"""テストパッケージ"""
