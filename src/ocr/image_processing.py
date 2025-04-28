@@ -1,9 +1,14 @@
 """画像処理とOCR関連の関数を提供するモジュール"""
 
+# 標準ライブラリインポート
 import re
+from typing import List, Dict, Any
+
+# サードパーティライブラリインポート
 from PIL import Image
 import pytesseract
-from typing import List, Dict, Any
+
+# ローカルアプリケーション/ライブラリ固有のインポート
 from .text_processing import get_name_from_table
 
 # デバッグモードを有効にする
@@ -24,8 +29,11 @@ def check_tesseract() -> bool:
     except pytesseract.TesseractNotFoundError:
         print("エラー: Tesseract OCRがインストールされていません。")
         return False
-    except Exception as e:
-        print(f"OCR確認中に不明なエラー: {e}")
+    except (IOError, OSError) as e:
+        print(f"OCR確認中のシステムエラー: {e}")
+        return False
+    except RuntimeError as e:
+        print(f"OCR確認中の実行時エラー: {e}")
         return False
 
 
@@ -124,6 +132,12 @@ def extract_data_from_image(image_path: str) -> List[Dict[str, Any]]:
     except pytesseract.TesseractNotFoundError:
         print("エラー: Tesseract OCRが見つかりません。インストールを確認してください。")
         return []
-    except Exception as e:
-        print(f"エラー: {image_path} の処理中に予期せぬエラー: {e}")
+    except (IOError, OSError) as e:
+        print(f"エラー: {image_path} の読み込み中にファイルエラー: {e}")
+        return []
+    except (ValueError, TypeError) as e:
+        print(f"エラー: {image_path} のデータ処理中に型エラー: {e}")
+        return []
+    except RuntimeError as e:
+        print(f"エラー: {image_path} の処理中に実行時エラー: {e}")
         return []
