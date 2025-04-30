@@ -2,10 +2,11 @@
 
 # 標準ライブラリインポート
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, cast
 
 # サードパーティライブラリインポート
-from PIL import Image
+from PIL import Image, ImageEnhance
+from PIL.Image import Image as PILImage
 import pytesseract
 
 # ローカルアプリケーション/ライブラリ固有のインポート
@@ -37,6 +38,33 @@ def check_tesseract() -> bool:
         return False
 
 
+def enhance_image(image: PILImage) -> PILImage:
+    """
+    画像の品質を向上させる
+
+    Args:
+        image: 元の画像
+
+    Returns:
+        処理された画像
+    """
+    # コントラストを強調
+    contrast_enhancer = ImageEnhance.Contrast(image)
+    enhanced = cast(PILImage, contrast_enhancer.enhance(1.5))
+
+    # シャープネスを強調
+    sharpness_enhancer = ImageEnhance.Sharpness(enhanced)
+    enhanced = cast(PILImage, sharpness_enhancer.enhance(1.5))
+
+    # 画像を拡大
+    width, height = enhanced.size
+    enhanced = cast(PILImage, enhanced.resize(
+        (width * 2, height * 2), Image.Resampling.LANCZOS
+    ))
+
+    return enhanced
+
+
 def extract_data_from_image(image_path: str) -> List[Dict[str, Any]]:
     """
     画像からテキストを抽出し、データを解析する
@@ -49,14 +77,20 @@ def extract_data_from_image(image_path: str) -> List[Dict[str, Any]]:
         date, pt, name, namaeのキーを持つ
     """
     try:
-        # 日本語OCRの設定
-        custom_config = r"--oem 1 --psm 6 -l jpn"
+        # OCRの設定
+        custom_config = r"--oem 1 --psm 6 -l jpn+jpn_vert --dpi 300"
 
         # 画像を読み込み
-        image = Image.open(image_path)
+        image = cast(PILImage, Image.open(image_path))
 
-        # より高い精度でOCRを実行
-        text = pytesseract.image_to_string(image, config=custom_config)
+        # 画像の品質を向上
+        enhanced_image = enhance_image(image)
+
+        # OCR実行（より高い精度で）
+        text = pytesseract.image_to_string(
+            enhanced_image,
+            config=custom_config,
+        )
 
         if DEBUG:
             print(f"\n--- Extracted Text from {image_path} ---")
@@ -109,20 +143,22 @@ def extract_data_from_image(image_path: str) -> List[Dict[str, Any]]:
 
                     # 名前マッピング取得
                     name_eng, namae_jp = get_name_from_table(raw_namae)
-
-                    data.append(
-                        {
-                            "date": current_date_str,
-                            "pt": str(pt),  # 文字列として保存
-                            "name": name_eng,
-                            "namae": namae_jp,
-                        }
-                    )
-                    if DEBUG:
-                        print(
-                            f"データ検出: date={current_date_str}, "
-                            f"pt={pt}, name={name_eng}, namae={namae_jp}"
+                    
+                    # 空文字列でない場合のみデータを追加
+                    if name_eng and namae_jp:
+                        data.append(
+                            {
+                                "date": current_date_str,
+                                "pt": str(pt),  # 文字列として保存
+                                "name": name_eng,
+                                "namae": namae_jp,
+                            }
                         )
+                        if DEBUG:
+                            print(
+                                f"データ検出: date={current_date_str}, "
+                                f"pt={pt}, name={name_eng}, namae={namae_jp}"
+                            )
                 else:
                     if DEBUG:
                         print(f"スキップ行(ポイント形式不一致): {line}")

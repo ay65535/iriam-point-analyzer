@@ -68,7 +68,7 @@ def main():
 
     # CSVに出力
     try:
-        with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+        with open(output_csv, "w", newline="", encoding="utf-8-sig") as csvfile:
             fieldnames = ["date", "pt", "name", "namae"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
