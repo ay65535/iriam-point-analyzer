@@ -58,9 +58,9 @@ def enhance_image(image: PILImage) -> PILImage:
 
     # 画像を拡大
     width, height = enhanced.size
-    enhanced = cast(PILImage, enhanced.resize(
-        (width * 2, height * 2), Image.Resampling.LANCZOS
-    ))
+    enhanced = cast(
+        PILImage, enhanced.resize((width * 2, height * 2), Image.Resampling.LANCZOS)
+    )
 
     return enhanced
 
@@ -143,7 +143,7 @@ def extract_data_from_image(image_path: str) -> List[Dict[str, Any]]:
 
                     # 名前マッピング取得
                     name_eng, namae_jp = get_name_from_table(raw_namae)
-                    
+
                     # 空文字列でない場合のみデータを追加
                     if name_eng and namae_jp:
                         data.append(

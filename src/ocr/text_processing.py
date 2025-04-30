@@ -9,11 +9,27 @@ from .constants import NAME_TABLE, ERROR_PATTERNS
 
 
 class NameMapping(TypedDict):
+    """名前の英語表記と日本語表記のマッピングを表す型です。
+
+    Attributes:
+        english (str): 英語表記の名前
+        japanese (str): 日本語表記の名前
+    """
+
     english: str
     japanese: str
 
 
 class NormalizationRule(TypedDict, total=False):
+    """名前の正規化ルールを表す型です。
+
+    Attributes:
+        keywords (List[str], optional): 正規化を適用するキーワードのリスト
+        pattern (str, optional): 正規化に使用する正規表現パターン
+        replacement (str, optional): 正規表現での置換文字列
+        normalized_name (str, optional): 正規化後の名前
+    """
+
     keywords: List[str]
     pattern: str
     replacement: str
@@ -21,12 +37,27 @@ class NormalizationRule(TypedDict, total=False):
 
 
 class SpecialNameMapping(TypedDict):
+    """特別な名前のマッピングルールを表す型です。
+
+    Attributes:
+        default_empty (NameMapping): 空文字列に対するデフォルトのマッピング
+        koguma_polaris_keywords (List[str]): こぐまポラリス判定用のキーワードリスト
+        koguma_polaris_mapping (NameMapping): こぐまポラリス用の名前マッピング
+    """
+
     default_empty: NameMapping
     koguma_polaris_keywords: List[str]
     koguma_polaris_mapping: NameMapping
 
 
 class SensitiveData(TypedDict):
+    """設定ファイルから読み込む機密データの構造を表す型です。
+
+    Attributes:
+        name_normalization_rules (List[NormalizationRule]): 名前の正規化ルールのリスト
+        special_name_mapping (SpecialNameMapping): 特別な名前のマッピングルール
+    """
+
     name_normalization_rules: List[NormalizationRule]
     special_name_mapping: SpecialNameMapping
 
@@ -86,11 +117,7 @@ def normalize_text_for_name(raw_name: str) -> str:
         "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
         "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
     )
-    han_chars = (
-        "0123456789"
-        "abcdefghijklmnopqrstuvwxyz"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    )
+    han_chars = "0123456789" "abcdefghijklmnopqrstuvwxyz" "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     # 文字列から文字列へのマッピングで変換テーブルを作成
     trans_table = str.maketrans(zen_chars, han_chars)
@@ -132,10 +159,8 @@ def get_name_from_table(namae: str) -> Tuple[str, str]:
 
     # fuzzywuzzyで近いものを探す
     candidates = list(name_mapping.keys())
-    match_result: Tuple[str, int] | None = process.extractOne(
-        normed, candidates
-    )
-    
+    match_result: Tuple[str, int] | None = process.extractOne(normed, candidates)
+
     # スコアが60以上の場合のみマッピングを使用
     if match_result and match_result[1] >= 60:
         close_jp = match_result[0]
